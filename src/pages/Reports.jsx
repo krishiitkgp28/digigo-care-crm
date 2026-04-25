@@ -173,16 +173,16 @@ export default function Reports() {
                     <h3 className="text-sm font-bold text-gray-800 uppercase tracking-widest mb-6">Conversion Tracking</h3>
                     <div className="space-y-8">
                         <div>
-                            <p className="text-sm font-semibold text-gray-900 mb-2">Daily Goal (5 Conversions)</p>
-                            {renderProgressBar(data.converted_leads, targets.daily)}
+                            <p className="text-sm font-semibold text-gray-900 mb-2">Daily Goal (5 Demo's)</p>
+                            {renderProgressBar(data.demo_scheduled+data.converted_leads, targets.daily)}
                         </div>
                         <div>
-                            <p className="text-sm font-semibold text-gray-900 mb-2">Weekly Goal (25 Conversions)</p>
-                            {renderProgressBar(data.converted_leads, targets.weekly)}
+                            <p className="text-sm font-semibold text-gray-900 mb-2">Weekly Goal (25 Demo's)</p>
+                            {renderProgressBar(data.demo_scheduled+data.converted_leads, targets.weekly)}
                         </div>
                         <div>
-                            <p className="text-sm font-semibold text-gray-900 mb-2">Monthly Goal (100 Conversions)</p>
-                            {renderProgressBar(data.converted_leads, targets.monthly)}
+                            <p className="text-sm font-semibold text-gray-900 mb-2">Monthly Goal (100 Demo's)</p>
+                            {renderProgressBar(data.demo_scheduled+data.converted_leads, targets.monthly)}
                         </div>
                     </div>
                 </div>

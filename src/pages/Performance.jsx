@@ -75,7 +75,7 @@ export default function Performance() {
                     </div>
                   </td>
                   <td className="px-6 py-4 text-sm font-bold text-gray-900 text-right">
-                    ${row.total_revenue.toLocaleString()}
+                    ₹{row.total_revenue.toLocaleString()}
                   </td>
                 </tr>
               ))}

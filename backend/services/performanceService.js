@@ -24,7 +24,7 @@ module.exports = {
       const converted = parseInt(row.converted_leads) || 0;
       const scheduled = parseInt(row.demo_scheduled) || 0;
       const attempts = scheduled + converted;
-      const conversion_rate = attempts > 0 ? ((converted / attempts) * 100).toFixed(2) : '0.00';
+      const conversion_rate = attempts > 0 ? ((converted /(row.contacted_leads)) * 100).toFixed(2) : '0.00';
       return {
         ...row,
         total_leads: total,

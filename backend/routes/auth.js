@@ -18,7 +18,7 @@ router.post('/login', async (req, res) => {
     });
   } catch (error) {
     console.error('Login error:', error.message);
-    const status = error.message.includes('Invalid') || error.message.includes('disabled') ? 401 : 500;
+    const status = error.message.includes('User not found') || error.message.includes('Incorrect password') || error.message.includes('disabled') ? 401 : 500;
     res.status(status).json({ success: false, message: error.message || 'Internal server error' });
   }
 });

@@ -52,7 +52,6 @@ async function initDB() {
     }
     await tempPool.end();
 
-    pool = new Pool({ ...dbConfig, database: TARGET_DB });
     const client = await pool.connect();
     console.log("Database connected successfully");
 

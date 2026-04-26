@@ -8,6 +8,7 @@ const dbConfig = {
   host: process.env.PGHOST || 'localhost',
   password: process.env.PGPASSWORD || 'postgres',
   port: process.env.PGPORT || 5432,
+  ssl: process.env.PGHOST && process.env.PGHOST !== 'localhost' ? { rejectUnauthorized: false } : false
 };
 const TARGET_DB = process.env.PGDATABASE || 'healthcare_crm';
 
@@ -51,6 +52,11 @@ async function initDB() {
       console.log("Database created successfully");
     }
     await tempPool.end();
+  } catch (err) {
+    console.log("Skipping database creation (likely already exists or permission denied on managed DB):", err.message);
+  }
+
+  try {
 
     const client = await pool.connect();
     console.log("Database connected successfully");

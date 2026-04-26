@@ -2,7 +2,7 @@ import axios from 'axios';
 import * as XLSX from "xlsx";
 
 const apiClient = axios.create({
-  baseURL: 'http://localhost:5000/api',
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
   headers: {
     'Content-Type': 'application/json'
   }

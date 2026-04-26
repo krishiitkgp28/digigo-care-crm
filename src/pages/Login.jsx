@@ -37,7 +37,10 @@ export default function Login() {
           alert(res.message || "Login failed");
         }
       } catch (err) {
-        const errorMsg = err.response?.data?.message || "Login failed: Invalid email or password.";
+        let errorMsg = "Login failed: Could not connect to the server. Please check your network or server URL.";
+        if (err.response) {
+            errorMsg = err.response?.data?.message || "Login failed: Invalid email or password.";
+        }
         alert(errorMsg);
       }
     }

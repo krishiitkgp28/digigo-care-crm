@@ -11,7 +11,9 @@ export default function DemoManagement() {
   const [dateFilter, setDateFilter] = useState('');
   const [activeTab, setActiveTab] = useState('upcoming'); // 'upcoming' or 'completed'
   const [editingDemo, setEditingDemo] = useState(null);
+  const [editingPlan, setEditingPlan] = useState(null);
   const [editForm, setEditForm] = useState({ date: '', time: '' });
+  const [planForm, setPlanForm] = useState({ planValue: '', duration: '' });
   const [error, setError] = useState(null);
 
   const [sortField, setSortField] = useState('date');
@@ -64,11 +66,35 @@ export default function DemoManagement() {
     try {
       setError(null);
       await api.updateDemo(editingDemo.id, { date: editForm.date, time: editForm.time });
-      await fetchAllData(); // Centralized API refetch for updated lists
+      await fetchAllData();
       setEditingDemo(null);
     } catch (err) {
       console.error(err);
       setError('Failed to update demo.');
+    }
+  };
+
+  const openPlanEdit = (demo) => {
+    setEditingPlan(demo);
+    setPlanForm({
+      planValue: demo.plan_value || '',
+      duration: demo.duration || ''
+    });
+  };
+
+  const handlePlanSave = async (e) => {
+    e.preventDefault();
+    try {
+      setError(null);
+      await api.updateDemoPlan(editingPlan.id, {
+        plan_value: Number(planForm.planValue),
+        duration: Number(planForm.duration)
+      });
+      await fetchAllData();
+      setEditingPlan(null);
+    } catch (err) {
+      console.error(err);
+      setError('Failed to update plan.');
     }
   };
 
@@ -172,14 +198,14 @@ export default function DemoManagement() {
             Completed Demos
           </button>
         </div>
-        <div>
+        {/* <div>
           <input
             type="date"
             value={dateFilter}
             onChange={(e) => setDateFilter(e.target.value)}
             className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
           />
-        </div>
+        </div> */}
       </div>
 
       <div className="bg-white shadow-sm rounded-2xl overflow-hidden border border-gray-200">
@@ -187,14 +213,14 @@ export default function DemoManagement() {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th 
+                <th
                   onClick={() => toggleSort('name')}
                   className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase cursor-pointer hover:bg-gray-100"
                 >
                   Client Name {sortField === 'name' && (sortOrder === 'asc' ? '↑' : '↓')}
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Intern Details</th>
-                <th 
+                <th
                   onClick={() => toggleSort('date')}
                   className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase cursor-pointer hover:bg-gray-100"
                 >
@@ -262,7 +288,7 @@ export default function DemoManagement() {
                             {demo.lead_status === 'Converted' ? (
                               <div className="text-xs space-y-1">
                                 <p className="font-bold text-emerald-700">Plan: ₹{demo.plan_value || lead?.planValue}</p>
-                                <p className="text-gray-600">Duration: {demo.duration || lead?.duration} year(s)</p>
+                                <p className="text-gray-600">Duration: {demo.duration || lead?.duration} Months</p>
                               </div>
                             ) : (
                               <>
@@ -272,21 +298,18 @@ export default function DemoManagement() {
                                   className="border border-green-300 bg-white text-green-800 rounded-lg px-2 py-1.5 text-xs focus:ring-green-500 outline-none w-full"
                                 >
                                   <option value="">Select Plan...</option>
-                                  <option value="999">Starter (₹999)</option>
-                                  <option value="2999">Smart (₹2999)</option>
-                                  <option value="4999">Pro (₹4999)</option>
+                                  <option value="499">Standard (₹499)</option>
+                                  <option value="1499">Premium (₹1499)</option>
+                                  <option value="2499">Enterprise (₹2499)</option>
                                 </select>
 
-                                <select
+                                <input
+                                  type="number"
+                                  placeholder="Months"
                                   value={currentDraft.duration || ''}
                                   onChange={(e) => handleDurationChange(demo.id, e.target.value)}
                                   className="border border-blue-300 bg-white text-blue-800 rounded-lg px-2 py-1.5 text-xs focus:ring-blue-500 outline-none w-full"
-                                >
-                                  <option value="">Select Duration...</option>
-                                  <option value="1">1 year</option>
-                                  <option value="2">2 years</option>
-                                  <option value="3">3 years</option>
-                                </select>
+                                />
                               </>
                             )}
                           </div>
@@ -304,7 +327,11 @@ export default function DemoManagement() {
                       </div>
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <button onClick={() => openEdit(demo)} className="text-indigo-600 hover:text-indigo-900 text-sm font-medium">Edit</button>
+                      {activeTab === 'upcoming' ? (
+                        <button onClick={() => openEdit(demo)} className="text-indigo-600 hover:text-indigo-900 text-sm font-medium">Edit</button>
+                      ) : (
+                        <button onClick={() => openPlanEdit(demo)} className="text-emerald-600 hover:text-emerald-900 text-sm font-medium">Edit Plan</button>
+                      )}
                     </td>
                   </tr>
                 );
@@ -342,7 +369,7 @@ export default function DemoManagement() {
               </div>
               <div>
                 <p className="text-xs text-gray-500">Duration</p>
-                <p className="text-sm font-semibold text-gray-900">{confirmModal.draft.duration} year(s)</p>
+                <p className="text-sm font-semibold text-gray-900">{confirmModal.draft.duration} Months</p>
               </div>
             </div>
             <div className="flex justify-end gap-3">
@@ -360,6 +387,46 @@ export default function DemoManagement() {
                 {loading ? 'Processing...' : 'Confirm Conversion'}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Editing Plan Modal */}
+      {editingPlan && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-xl">
+            <h2 className="text-lg font-bold text-gray-900 mb-4">Edit Subscription Plan</h2>
+            <form onSubmit={handlePlanSave} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Select Plan</label>
+                <select
+                  value={planForm.planValue}
+                  onChange={e => setPlanForm({ ...planForm, planValue: e.target.value })}
+                  className="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
+                  required
+                >
+                  <option value="">Select Plan...</option>
+                  <option value="499">Standard (₹499)</option>
+                  <option value="1499">Premium (₹1499)</option>
+                  <option value="2499">Enterprise (₹2499)</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Duration (Months)</label>
+                <input
+                  type="number"
+                  value={planForm.duration}
+                  onChange={e => setPlanForm({ ...planForm, duration: e.target.value })}
+                  className="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
+                  required
+                  min="1"
+                />
+              </div>
+              <div className="flex justify-end gap-3 mt-6 pt-2">
+                <button type="button" onClick={() => setEditingPlan(null)} className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition">Cancel</button>
+                <button type="submit" className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-sm transition">Save Plan</button>
+              </div>
+            </form>
           </div>
         </div>
       )}

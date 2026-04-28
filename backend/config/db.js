@@ -12,7 +12,15 @@ const dbConfig = {
 };
 const TARGET_DB = process.env.PGDATABASE || 'healthcare_crm';
 
-let pool = new Pool({ ...dbConfig, database: TARGET_DB });
+let pool;
+if (process.env.DATABASE_URL) {
+  pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: { rejectUnauthorized: false }
+  });
+} else {
+  pool = new Pool({ ...dbConfig, database: TARGET_DB });
+}
 
 async function seedUsers(client) {
   try {
@@ -45,13 +53,15 @@ async function seedUsers(client) {
 
 async function initDB() {
   try {
-    const tempPool = new Pool({ ...dbConfig, database: 'postgres' });
-    const checkDb = await tempPool.query(`SELECT 1 FROM pg_database WHERE datname='${TARGET_DB}'`);
-    if (checkDb.rowCount === 0) {
-      await tempPool.query(`CREATE DATABASE ${TARGET_DB}`);
-      console.log("Database created successfully");
+    if (!process.env.DATABASE_URL) {
+      const tempPool = new Pool({ ...dbConfig, database: 'postgres' });
+      const checkDb = await tempPool.query(`SELECT 1 FROM pg_database WHERE datname='${TARGET_DB}'`);
+      if (checkDb.rowCount === 0) {
+        await tempPool.query(`CREATE DATABASE ${TARGET_DB}`);
+        console.log("Database created successfully");
+      }
+      await tempPool.end();
     }
-    await tempPool.end();
   } catch (err) {
     console.log("Skipping database creation (likely already exists or permission denied on managed DB):", err.message);
   }

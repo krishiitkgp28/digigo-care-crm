@@ -25,8 +25,8 @@ module.exports = {
     return await userRepo.updateGroup(id, group_name);
   },
   
-  updateProfile: async (id, gender) => {
-    return await userRepo.updateProfile(id, gender);
+  updateProfile: async (id, name, gender) => {
+    return await userRepo.updateProfile(id, name, gender);
   },
   
   deactivateUser: async (adminId, targetId) => {

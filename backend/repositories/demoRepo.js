@@ -5,7 +5,14 @@ module.exports = {
     const res = await pool.query(`
       SELECT 
         d.id, d.lead_id, d.intern_id, d.date, d.time, 
-        (d.date || ' ' || d.time) AS timeline,
+        (
+          SELECT al.timestamp AT TIME ZONE 'Asia/Kolkata'
+          FROM activity_log al
+          WHERE al.details LIKE '%' || d.id || '%'
+          AND al.action IN ('Demo Scheduled', 'Demo Converted', 'Plan Updated')
+          ORDER BY al.timestamp DESC
+          LIMIT 1
+        ) AS timeline,
         d.status, d.feedback, d.created_at,
         l.name AS lead_name, l.contact AS lead_contact, l.email AS lead_email, l.location AS lead_location, l.city as lead_city, l.status AS lead_status,
         l.plan_value, l.duration,
@@ -13,7 +20,7 @@ module.exports = {
       FROM demos d
       LEFT JOIN leads l ON d.lead_id = l.id
       LEFT JOIN users u ON d.intern_id = u.id
-      ORDER BY d.date ASC, d.time ASC
+      ORDER BY d.date::date ASC, d.time::time ASC
     `);
     return res.rows;
   },
@@ -21,7 +28,14 @@ module.exports = {
     const res = await pool.query(`
       SELECT 
         d.id, d.lead_id, d.intern_id, d.date, d.time, 
-        (d.date || ' ' || d.time) AS timeline,
+        (
+          SELECT al.timestamp AT TIME ZONE 'Asia/Kolkata'
+          FROM activity_log al
+          WHERE al.details LIKE '%' || d.id || '%'
+          AND al.action IN ('Demo Scheduled', 'Demo Converted', 'Plan Updated')
+          ORDER BY al.timestamp DESC
+          LIMIT 1
+        ) AS timeline,
         d.status, d.feedback, d.created_at,
         l.name AS lead_name, l.contact AS lead_contact, l.email AS lead_email, l.location AS lead_location, l.city as lead_city, l.status AS lead_status,
         l.plan_value, l.duration,
@@ -30,7 +44,7 @@ module.exports = {
       LEFT JOIN leads l ON d.lead_id = l.id
       LEFT JOIN users u ON d.intern_id = u.id
       WHERE d.intern_id = $1
-      ORDER BY d.date ASC, d.time ASC
+      ORDER BY d.date::date ASC, d.time::time ASC
     `, [internId]);
     return res.rows;
   },

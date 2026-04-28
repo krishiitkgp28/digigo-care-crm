@@ -9,7 +9,9 @@ export default function InternControl() {
   const [selectedIntern, setSelectedIntern] = useState('');
   
   const [editingLead, setEditingLead] = useState(null);
+  const [editingDemo, setEditingDemo] = useState(null);
   const [leadForm, setLeadForm] = useState({ name: '', contact: '', email: '', location: '', city: '', status: '', plan_value: 0, duration: 0 });
+  const [demoForm, setDemoForm] = useState({ date: '', time: '' });
   const [error, setError] = useState(null);
   
   const interns = users.filter(u => u.role === 'intern');
@@ -69,8 +71,27 @@ export default function InternControl() {
       }
   };
 
-  const handleEditDemo = async (demo) => {
-      setError("Edit demo functionality via modal to be implemented fully.");
+  const handleEditDemoClick = (demo) => {
+      setEditingDemo(demo);
+      setDemoForm({ 
+          date: demo.date || '', 
+          time: demo.time || '' 
+      });
+  };
+
+  const submitEditDemo = async (e) => {
+      e.preventDefault();
+      try {
+        setError(null);
+        await api.updateDemo(editingDemo.id, { 
+            date: demoForm.date, 
+            time: demoForm.time 
+        });
+        await fetchAllData();
+        setEditingDemo(null);
+      } catch (err) {
+        setError(err.response?.data?.error || "Failed to edit demo.");
+      }
   };
 
   const handleDeleteDemo = async (demoId) => {
@@ -166,7 +187,7 @@ export default function InternControl() {
                                         <td className="px-4 py-3 text-xs text-gray-600">{new Date(d.date).toLocaleDateString()}<br/>{d.time}</td>
                                         <td className="px-4 py-3 text-xs font-semibold text-emerald-600">{d.status}</td>
                                         <td className="px-4 py-3 space-x-2 text-right">
-                                            <button onClick={() => handleEditDemo(d)} className="text-blue-600 hover:text-blue-800 text-xs font-bold">Edit</button>
+                                            <button onClick={() => handleEditDemoClick(d)} className="text-blue-600 hover:text-blue-800 text-xs font-bold">Edit</button>
                                             <button onClick={() => handleDeleteDemo(d.id)} className="text-red-600 hover:text-red-800 text-xs font-bold">Delete</button>
                                         </td>
                                     </tr>
@@ -206,6 +227,27 @@ export default function InternControl() {
                         </div>
                         <div className="flex justify-end gap-3 mt-6 pt-2">
                             <button type="button" onClick={() => setEditingLead(null)} className="px-4 py-2 text-sm font-medium bg-gray-100 rounded-lg">Cancel</button>
+                            <button type="submit" className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        )}
+        {editingDemo && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                <div className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-xl">
+                    <h2 className="text-lg font-bold text-gray-900 mb-4">Edit Demo</h2>
+                    <form onSubmit={submitEditDemo} className="space-y-4">
+                        <div>
+                            <label className="block text-xs font-medium text-gray-700 mb-1">Date</label>
+                            <input type="date" value={demoForm.date} onChange={e => setDemoForm({...demoForm, date: e.target.value})} className="w-full border rounded-lg px-3 py-2 text-sm" required />
+                        </div>
+                        <div>
+                            <label className="block text-xs font-medium text-gray-700 mb-1">Time</label>
+                            <input type="time" value={demoForm.time} onChange={e => setDemoForm({...demoForm, time: e.target.value})} className="w-full border rounded-lg px-3 py-2 text-sm" required />
+                        </div>
+                        <div className="flex justify-end gap-3 mt-6 pt-2">
+                            <button type="button" onClick={() => setEditingDemo(null)} className="px-4 py-2 text-sm font-medium bg-gray-100 rounded-lg">Cancel</button>
                             <button type="submit" className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg">Save Changes</button>
                         </div>
                     </form>

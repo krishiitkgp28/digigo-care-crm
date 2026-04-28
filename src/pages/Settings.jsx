@@ -23,14 +23,6 @@ export default function Settings() {
   ];
 
   const handleSave = async () => {
-      // Logic for saving profile data to global context
-      if (user.role === 'intern') {
-          setInterns(prev => prev.map(i => i.id === user.id ? { ...i, name, gender, avatar } : i));
-          setUser(prev => ({ ...prev, name, gender, avatar }));
-      } else {
-          setUser(prev => ({ ...prev, name, gender, avatar }));
-      }
-      
       try {
           const profileRes = await fetch(`http://localhost:5000/api/users/${user.id}/profile`, {
               method: 'PUT',
@@ -38,24 +30,20 @@ export default function Settings() {
                  'Content-Type': 'application/json',
                  'Authorization': `Bearer ${localStorage.getItem('token')}` 
               },
-              body: JSON.stringify({ gender })
+              body: JSON.stringify({ name, gender })
           });
           
           if (profileRes.ok) {
-              const res = await fetch('http://localhost:5000/api/auth/verify', {
-                  headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-              });
-              const data = await res.json();
-              if (res.ok && (data.valid || data.success)) {
-                  setUser(prev => ({ ...prev, ...(data.user || data.data?.user) }));
-                  if (fetchAllData) await fetchAllData();
-              }
+              await fetchAllData();
+              alert('Profile updated and synced successfully!');
+          } else {
+              const errData = await profileRes.json();
+              alert(`Failed to update: ${errData.message || 'Server error'}`);
           }
       } catch (err) {
           console.error(err);
+          alert('Sync failed. Please check your connection.');
       }
-      
-      alert('Profile synced globally successfully!');
   };
 
   const handleChangePassword = async (e) => {

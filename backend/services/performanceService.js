@@ -20,20 +20,26 @@ module.exports = {
     const res = await pool.query(query);
     
     return res.rows.map(row => {
-      const total = parseInt(row.total_leads) || 0;
-      const converted = parseInt(row.converted_leads) || 0;
       const scheduled = parseInt(row.demo_scheduled) || 0;
-      const attempts = scheduled + converted;
-      const conversion_rate = attempts > 0 ? ((converted /(row.contacted_leads)) * 100).toFixed(2) : '0.00';
+      const converted = parseInt(row.converted_leads) || 0;
+      const contacted = parseInt(row.contacted_leads) || 0;
+
+      const totalDemos = scheduled + converted;
+
+      const conversion_rate =
+        contacted > 0
+          ? ((totalDemos / contacted) * 100).toFixed(2)
+          : '0.00';
+
       return {
         ...row,
-        total_leads: total,
-        contacted_leads: parseInt(row.contacted_leads) || 0,
-        demo_scheduled: scheduled,
+        total_leads: parseInt(row.total_leads) || 0,
+        contacted_leads: contacted,
+        demo_scheduled: totalDemos,
         converted_leads: converted,
         conversion_rate: parseFloat(conversion_rate),
         total_revenue: parseFloat(row.total_revenue) || 0
       };
-    }).sort((a, b) => b.conversion_rate - a.conversion_rate);
+    }).sort((a, b) => b.demo_scheduled - a.demo_scheduled);
   }
 };

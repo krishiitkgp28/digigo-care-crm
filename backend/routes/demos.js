@@ -52,4 +52,15 @@ router.put('/:id/feedback', authenticateToken, async (req, res) => {
     }
 });
 
+router.put('/:id/plan', authenticateToken, async (req, res) => {
+    const { id } = req.params;
+    const { plan_value, duration } = req.body;
+    try {
+        const result = await demoService.updatePlan(req.user.id, id, plan_value, duration);
+        res.json({ success: true, data: result });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message || 'Plan update failed' });
+    }
+});
+
 module.exports = router;

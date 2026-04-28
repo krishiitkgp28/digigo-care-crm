@@ -10,13 +10,16 @@ module.exports = {
         let whereClause = 'WHERE assigned_to_id = $1';
         let params = [user.id];
 
+        const IST_DATE = "(CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Kolkata')::date";
+        const IST_TIMESTAMP = "(CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Kolkata')";
+
         if (range === 'today') {
-            whereClause += ' AND DATE(created_at) = CURRENT_DATE';
+            whereClause += ` AND DATE(created_at AT TIME ZONE 'Asia/Kolkata') = ${IST_DATE}`;
         } else if (range === 'week' && week) {
-            whereClause += ` AND FLOOR((EXTRACT(DAY FROM (CURRENT_TIMESTAMP - created_at)) / 7)) + 1 = $${params.length + 1}`;
+            whereClause += ` AND FLOOR((EXTRACT(DAY FROM (${IST_TIMESTAMP} - (created_at AT TIME ZONE 'Asia/Kolkata'))) / 7)) + 1 = $${params.length + 1}`;
             params.push(parseInt(week));
         } else if (range === 'month' && month) {
-            whereClause += ` AND FLOOR((EXTRACT(DAY FROM (CURRENT_TIMESTAMP - created_at)) / 30)) + 1 = $${params.length + 1}`;
+            whereClause += ` AND FLOOR((EXTRACT(DAY FROM (${IST_TIMESTAMP} - (created_at AT TIME ZONE 'Asia/Kolkata'))) / 30)) + 1 = $${params.length + 1}`;
             params.push(parseInt(month));
         }
 
@@ -34,17 +37,23 @@ module.exports = {
         const res = await pool.query(query, params);
         const data = res.rows[0];
 
-        const total = parseInt(data.total_leads) || 0;
-        const converted = parseInt(data.converted_leads) || 0;
         const scheduled = parseInt(data.demo_scheduled) || 0;
-        const attempts = scheduled + converted;
+        const converted = parseInt(data.converted_leads) || 0;
+        const contacted = parseInt(data.contacted_leads) || 0;
+
+        const totalDemos = scheduled + converted;
+
+        const conversion_rate =
+            contacted > 0
+                ? ((totalDemos / contacted) * 100).toFixed(2)
+                : '0.00';
 
         return {
-            total_leads: total,
-            contacted_leads: parseInt(data.contacted_leads) || 0,
-            demo_scheduled: scheduled,
+            total_leads: parseInt(data.total_leads) || 0,
+            contacted_leads: contacted,
+            demo_scheduled: totalDemos,
             converted_leads: converted,
-            conversion_rate: attempts > 0 ? ((converted / attempts) * 100).toFixed(2) : '0.00',
+            conversion_rate: parseFloat(conversion_rate),
             revenue: parseFloat(data.revenue) || 0
         };
     }

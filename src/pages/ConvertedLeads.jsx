@@ -3,7 +3,7 @@ import { useAppContext } from '../context/AppContext';
 
 export default function ConvertedLeads() {
   const { leads, interns, fetchAllData } = useAppContext();
-  
+
   const [editingLead, setEditingLead] = useState(null);
   const [editForm, setEditForm] = useState({ planValue: '', duration: '' });
 
@@ -64,7 +64,7 @@ export default function ConvertedLeads() {
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Group</th>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Plan Value</th>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Conversion Date</th>
-                <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase">Actions</th>
+                {/* <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase">Actions</th> */}
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -86,14 +86,14 @@ export default function ConvertedLeads() {
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                         {formatCurrency((lead.planValue || 0) * (lead.duration || 1))}
                       </span>
-                      <div className="text-[10px] text-gray-400 mt-0.5">{lead.planValue} × {lead.duration}yr</div>
+                      <div className="text-[10px] text-gray-400 mt-0.5">{lead.planValue} × {lead.duration} Months</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {formatDate(lead.actionDate)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    {/* <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <button onClick={() => openEdit(lead)} className="text-indigo-600 hover:text-indigo-900">Edit</button>
-                    </td>
+                    </td> */}
                   </tr>
                 );
               })}
@@ -114,9 +114,9 @@ export default function ConvertedLeads() {
             <form onSubmit={saveEdit} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Plan</label>
-                <select 
-                  value={editForm.planValue} 
-                  onChange={e => setEditForm({...editForm, planValue: e.target.value})}
+                <select
+                  value={editForm.planValue}
+                  onChange={e => setEditForm({ ...editForm, planValue: e.target.value })}
                   className="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
                   required
                 >
@@ -128,9 +128,9 @@ export default function ConvertedLeads() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Duration</label>
-                <select 
-                  value={editForm.duration} 
-                  onChange={e => setEditForm({...editForm, duration: e.target.value})}
+                <select
+                  value={editForm.duration}
+                  onChange={e => setEditForm({ ...editForm, duration: e.target.value })}
                   className="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
                   required
                 >

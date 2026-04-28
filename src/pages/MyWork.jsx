@@ -6,6 +6,10 @@ const STATUS_OPTIONS = [
   "Not Contacted", "Follow-up Required", "Demo Scheduled"
 ];
 
+const FILTER_OPTIONS = [
+  "Not Contacted", "Follow-up Required", "Demo Scheduled", "Converted"
+];
+
 const STATUS_COLORS = {
   "Not Contacted": "bg-gray-100 text-gray-700",
   "Follow-up Required": "bg-yellow-100 text-yellow-700",
@@ -149,7 +153,7 @@ export default function MyWork() {
             className="border border-gray-300 rounded-xl px-3 py-2 text-sm focus:ring-indigo-500 focus:border-indigo-500 outline-none"
           >
             <option value="">All Statuses</option>
-            {STATUS_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
+            {FILTER_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
           </select>
         </div>
       </div>
@@ -253,6 +257,7 @@ export default function MyWork() {
               onChange={e => setFeedbackModal({ ...feedbackModal, feedback: e.target.value })}
               className="w-full border border-gray-300 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 h-32 text-sm"
               placeholder="Add feedback about this lead..."
+              maxLength={2000}
             />
             <div className="flex justify-end space-x-3 mt-5">
               <button onClick={() => setFeedbackModal({ isOpen: false, leadId: null, feedback: '' })} className="px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-xl text-gray-700 bg-white hover:bg-gray-50 transition-colors">Cancel</button>

@@ -33,12 +33,12 @@ router.put('/:id/group', authenticateToken, async (req, res) => {
 
 router.put('/:id/profile', authenticateToken, async (req, res) => {
   const { id } = req.params;
-  const { gender } = req.body;
+  const { name, gender } = req.body;
   if (req.user.id !== parseInt(id) && req.user.role !== 'admin') {
     return res.status(403).json({ success: false, message: 'Forbidden' });
   }
   try {
-    const result = await userService.updateProfile(id, gender);
+    const result = await userService.updateProfile(id, name, gender);
     if (!result) return res.status(404).json({ success: false, message: 'User not found' });
     res.json({ success: true, data: result });
   } catch (err) {

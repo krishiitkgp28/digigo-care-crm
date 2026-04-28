@@ -130,6 +130,10 @@ export const api = {
     const res = await apiClient.put(`/demos/${id}/convert`, payload);
     return res.data?.data || res.data;
   },
+  updateDemoPlan: async (id, payload) => {
+    const res = await apiClient.put(`/demos/${id}/plan`, payload);
+    return res.data?.data || res.data;
+  },
   updateDemoFeedback: async (id, feedback) => {
     const res = await apiClient.put(`/demos/${id}/feedback`, { feedback });
     return res.data?.data || res.data;

@@ -7,12 +7,7 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
-  const { setUser, interns } = useAppContext();
-
-  const handleAutoLoginAdmin = () => {
-    setEmail('admin@crm.com');
-    setPassword('admin123');
-  };
+  const { setUser } = useAppContext();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -65,9 +60,6 @@ export default function Login() {
           <div className="flex flex-col gap-3">
             <button type="submit" className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200">
               Sign In
-            </button>
-            <button type="button" onClick={handleAutoLoginAdmin} className="w-full flex justify-center py-2.5 px-4 border border-indigo-600/50 rounded-xl shadow-sm text-sm font-medium text-indigo-700 bg-indigo-50 hover:bg-indigo-100 transition-colors duration-200">
-              Login as Admin (Auto-fill)
             </button>
           </div>
         </form>

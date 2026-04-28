@@ -64,9 +64,23 @@ module.exports = {
       if (leadRes.rows.length === 0) throw new Error('Lead update failed');
       
       const demoRes = await client.query('UPDATE demos SET status = $1 WHERE id = $2 RETURNING *', ['Completed', id]);
-      await activityRepo.log(userId, 'Demo Converted', `Converted demo ${id} to ${status}`, client);
+      await activityRepo.log(userId, 'Demo Converted', `Converted demo ${id} to ${status} with plan ₹${plan_value} for ${duration} months`, client);
       
       return { lead: leadRes.rows[0], demo: demoRes.rows[0] };
+    });
+  },
+
+  updatePlan: async (userId, id, plan_value, duration) => {
+    const demo = await demoRepo.findById(id);
+    if (!demo) throw new Error('Demo not found');
+    
+    return await runTransaction(async (client) => {
+      await client.query(
+        'UPDATE leads SET plan_value = $1, duration = $2 WHERE id = $3',
+        [plan_value, duration, demo.lead_id]
+      );
+      await activityRepo.log(userId, 'Plan Updated', `Updated plan for demo ${id} to ₹${plan_value} for ${duration} months`, client);
+      return { success: true };
     });
   },
   

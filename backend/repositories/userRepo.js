@@ -45,10 +45,10 @@ module.exports = {
     );
     return res.rows[0];
   },
-  updateProfile: async (id, gender) => {
+  updateProfile: async (id, name, gender) => {
     const res = await pool.query(
-      `UPDATE users SET gender = $1 WHERE id = $2 RETURNING id, name, email, role, group_name, account_id, gender, is_active`,
-      [gender, id]
+      `UPDATE users SET name = $1, gender = $2 WHERE id = $3 RETURNING id, name, email, role, group_name, account_id, gender, is_active`,
+      [name, gender, id]
     );
     return res.rows[0];
   },
